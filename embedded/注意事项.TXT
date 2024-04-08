@@ -1,0 +1,9 @@
+项目名称：一氧化碳报警器
+技术讨论QQ群：821417708
+作者：肆伍
+时间：2024/1/16
+CSDN链接：https://blog.csdn.net/weixin_66429380/article/details/135442185
+哔哩哔哩链接：https://www.bilibili.com/video/BV1Zg4y1D78z/
+如在做项目时遇到困难可在群中咨询
+群中另有多项开源项目分享
+未经允许，禁止商用！
