@@ -54,7 +54,6 @@ export default {
     };
   },
   methods: {
-
     toggleForm(isRegister) {
       this.isRegister = isRegister;
       this.formBoxTransform = isRegister ? 'translateX(10%)' : 'translateX(95%)';

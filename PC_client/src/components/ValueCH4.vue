@@ -7,12 +7,6 @@ import * as echarts from 'echarts';
 import {CH4ValueAPI} from "@/plugins";
 
 export default {
-  props: {
-    thresholdValue: {
-      type: Number,
-      required: true
-    }
-  },
   data() {
     return {
       data: [],

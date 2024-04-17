@@ -1,98 +1,74 @@
 <template>
   <div class="card-container">
-    <el-card class="box-card">
-      <p>一氧化碳传感器</p>
-      <el-slider
-          v-model="CO_value"
-          vertical
-          height="350px"
-          :min=0
-          :max=50>
-      </el-slider>
-      <p>当前一氧化碳上限:{{CO_value}}</p>
-      <el-switch
-          v-model="switch_CO"
-          active-text="on"
-          inactive-text="off">
-      </el-switch>
-    </el-card>
-
-    <el-card class="box-card">
-      <p>二氧化碳传感器</p>
-      <el-slider
-          v-model="CO2_value"
-          vertical
-          height="350px"
-          :min=300
-          :max=2000>
-      </el-slider>
-      <p>当前二氧化碳上限:{{CO2_value}}</p>
-      <el-switch
-          v-model="switch_CO2"
-          active-text="on"
-          inactive-text="off">
-      </el-switch>
-    </el-card>
-
-    <el-card class="box-card">
-      <p>甲烷传感器</p>
-      <el-slider
-          v-model="CH4_value"
-          vertical
-          height="350px"
-          :min=0
-          :max=50>
-      </el-slider>
-      <p>当前甲烷碳上限:{{CH4_value}}</p>
-      <el-switch
-          v-model="switch_CH4"
-          active-text="on"
-          inactive-text="off">
-      </el-switch>
-    </el-card>
-
-    <el-card class="box-card">
-      <p>氢气传感器</p>
-      <el-slider
-          v-model="H2_value"
-          vertical
-          height="350px"
-          :min=0
-          :max=50>
-      </el-slider>
-      <p>当前氢气上限:{{H2_value}}</p>
-      <el-switch
-          v-model="switch_H2"
-          active-text="on"
-          inactive-text="off">
-      </el-switch>
+    <el-card v-for="(sensor, index) in sensors" :key="index" class="box-card">
+      <p>{{ sensor.name }}</p>
+      <el-slider v-model="sensor.value" vertical height="350px" :min="0" :max="sensor.max" @change="updateSensorValue(sensor.value, sensor.type)"></el-slider>
+      <p>{{ sensor.label }}: {{ sensor.value }}</p>
+      <el-switch v-model="sensor.switchValue" active-text="on" inactive-text="off" @change="updateSwitchValue(sensor.switchValue, sensor.switchType)"></el-switch>
     </el-card>
   </div>
 </template>
 
 <script>
+import { changeValueAPI,changeSwitchAPI } from "@/plugins";
+
 export default {
-  name: 'SymmetricCards',
-  data(){
-    return{
-      CO_value:10,
-      CO2_value:500,
-      CH4_value:12,
-      H2_value:18,
-      switch_CO:false,
-      switch_CO2:false,
-      switch_CH4:false,
-      switch_H2:false,
+  data() {
+    return {
+      sensors: [
+        { name: '一氧化碳传感器', value: this.$store.state.CO_value, max: 50, type: 'CO', label: '当前一氧化碳上限', switchValue: this.$store.state.switch_CO, switchType: 'CO' },
+        { name: '二氧化碳传感器', value: this.$store.state.CO2_value, max: 80, type: 'CO2', label: '当前二氧化碳上限', switchValue: this.$store.state.switch_CO2, switchType: 'CO2' },
+        { name: '甲烷传感器', value: this.$store.state.CH4_value, max: 50, type: 'CH4', label: '当前甲烷上限', switchValue: this.$store.state.switch_CH4, switchType: 'CH4' },
+        { name: '氢气传感器', value: this.$store.state.H2_value, max: 50, type: 'H2', label: '当前氢气上限', switchValue: this.$store.state.switch_H2, switchType: 'H2' },
+      ]
     }
   },
-}
+  methods: {
+    updateSensorValue(value, type) {
+      switch (type) {
+        case 'CO':
+          this.$store.commit('setCOValue', value);
+          break;
+        case 'CO2':
+          this.$store.commit('setCO2Value', value);
+          break;
+        case 'CH4':
+          this.$store.commit('setCH4Value', value);
+          break;
+        case 'H2':
+          this.$store.commit('setH2Value', value);
+          break;
+      }
+      changeValueAPI(this.$store.state.CH4_value, this.$store.state.H2_value, this.$store.state.CO_value, this.$store.state.CO2_value);
+    },
+    updateSwitchValue(value, type) {
+      switch (type) {
+        case 'CO':
+          this.$store.commit('setSwitchCO', value);
+          break;
+        case 'CO2':
+          this.$store.commit('setSwitchCO2', value);
+          break;
+        case 'CH4':
+          this.$store.commit('setSwitchCH4', value);
+          break;
+        case 'H2':
+          this.$store.commit('setSwitchH2', value);
+          break;
+      }
+      changeSwitchAPI(this.$store.state.switch_CH4, this.$store.state.switch_H2, this.$store.state.switch_CO, this.$store.state.switch_CO2);
+    },
+  },
+
+};
 </script>
 
+
 <style scoped>
-.card-container{
+.card-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between; /* 控制左右对齐 */
+  justify-content: space-between;
 }
 
 .box-card {
@@ -123,7 +99,7 @@ export default {
   padding-left: 40px;
 }
 
-p{
+p {
   text-align: center;
   font-size: 20px;
   margin-top: 40px;

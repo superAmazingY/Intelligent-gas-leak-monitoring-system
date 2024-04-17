@@ -1,4 +1,5 @@
 import service from "@/plugins/axios";
+const { createCommonToken } = require('./key.js');
 export const loginAPI = (userId, password) => {
     const url = `http://8.130.146.112:8099/user/login?userId=${userId}&passwd=${password}`;
     // 发起网络请求
@@ -53,33 +54,65 @@ export const ErrorInfoAPI = () => {
     });
 }
 
-export const fetchDevData = () => {
-    const params = {
-        author_key: 'BGjW9C6BkVrAyiyIK9gGihC/aiVZpACBsNKeW1dvXifY3jCbAqO5AvydhSum7X+3c86hRjvl/T/7OUpoSN1OOg==',
-        version: '2022-05-01',
-        user_id: '376681',
-    }
-    const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property';
-    const data = {
-        product_id: 'CFcMIQYDRa',
-        device_name: 'D1'
-    };
-    const headers = {
-        'authorization': createCommonToken(params)
-    };
+const token = createCommonToken({
+    author_key: 'BGjW9C6BkVrAyiyIK9gGihC/aiVZpACBsNKeW1dvXifY3jCbAqO5AvydhSum7X+3c86hRjvl/T/7OUpoSN1OOg==',
+    version: '2022-05-01',
+    user_id: '376681'
+});
 
+export const changeValueAPI = (CH4,H2,CO,CO2) => {
+    let key_th = {
+        CH4_max: CH4,
+        H2_max: H2,
+        CO_max: CO,
+        CO2_max: CO2,
+    };
+    const url =`https://iot-api.heclouds.com/thingmodel/set-device-property`;
     return service({
         url: url,
-        method: 'GET',
-        params: data,
-        headers: headers
+        method: 'POST',
+        data: {
+            product_id: 'CFcMIQYDRa',
+            device_name: 'D1',
+            params: key_th
+        },
+        headers: {
+            'authorization': token //自定义请求头信息
+        }
     }).then(response => {
-        console.log(response.data);
-        const data = response.data.data;
-        const [BEEP, CH4, CO, CO2, H2, led] = data.map(item => item.value);
-        return { BEEP, CH4, CO, CO2, H2, led };
+        console.log('请求成功，响应数据为：', response.data);
+        return response; // 返回响应数据
     }).catch(error => {
-        console.error('Error fetching device data:', error);
-        throw error;
+        console.error('请求失败，错误信息为：', error);
+        throw error; // 抛出错误
     });
-};
+}
+
+export const changeSwitchAPI = (CH4,H2,CO,CO2) => {
+    let key_th = {
+        CH4_bool: CH4,
+        H2_bool: H2,
+        CO_bool: CO,
+        CO2_bool: CO2,
+    };
+    const url =`https://iot-api.heclouds.com/thingmodel/set-device-property`;
+    return service({
+        url: url,
+        method: 'POST',
+        data: {
+            product_id: 'CFcMIQYDRa',
+            device_name: 'D1',
+            params: key_th
+        },
+        headers: {
+            'authorization': token //自定义请求头信息
+        }
+    }).then(response => {
+        console.log('请求成功，响应数据为：', response.data);
+        return response; // 返回响应数据
+    }).catch(error => {
+        console.error('请求失败，错误信息为：', error);
+        throw error; // 抛出错误
+    });
+}
+

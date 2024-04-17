@@ -12,6 +12,8 @@ class User : public drogon::HttpController<User>
        //url: http://8.130.146.112:8099/user/login?userId={1}&passwd={2}(登录api）
        METHOD_ADD(User::registerInfo, "register?userId={1}&passwd={2}&phone_number={3}", Post,Options);
        //url: http://8.130.146.112:8099/user/register?userId={1}&passwd={2}&phone_number={3}(注册api)
+       METHOD_ADD(User::oneNetInfo,"oneNet?co={1}&co2={2}&ch4={3}&h2={4}&time={5}&flag={6}&info={7}",Post,Options);
+       //url: http://8.130.146.112:8099/user/oneNet?co={1}&co2={2}&ch4={3}&h2={4}&time={5}&flag={6}&info={7}
        METHOD_ADD(User::getCoInfo,"CoInfo",Get,Options);
        //url: http://8.130.146.112:8099/user/CoInfo(一氧化碳含量api)
        METHOD_ADD(User::getCo2Info,"Co2Info",Get,Options);
@@ -34,6 +36,15 @@ class User : public drogon::HttpController<User>
                std::string &&userId,
                const std::string &password,
                const std::string &phone_number);
+       void oneNetInfo(const HttpRequestPtr &req,
+               std::function<void(const HttpResponsePtr &)> &&callback,
+               std::string &&co,
+               std::string &&co2,
+               std::string &&ch4,
+               std::string &&h2,
+               std::string &&time,
+               std::string &&flag,
+               std::string &&info);
 
     //get函数实现虚函数
        void getCoInfo(const HttpRequestPtr &req,std::function<void(const HttpResponsePtr &)> &&callback);
