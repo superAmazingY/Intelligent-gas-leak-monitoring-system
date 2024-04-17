@@ -63,7 +63,8 @@ int main(void)
 			if(System_Flag == 91)
 			{
 				OLED_Clear(0);
-        Uart3_SU03T_SendCMD2(0x09);
+        Uart3_SU03T_SendCMD2(0x04);
+
 				System_Flag = 92;
 			}
 			else if(System_Flag == 92)
@@ -122,13 +123,8 @@ int main(void)
 		Adc_Init();		  		//ADC初始化
   
 		OLED_Init();
-    
-    Uart3_SU03T_SendCMD2(0x08);//播报硬件正在初始化
-    OLED_ShowString(0,0,"Hardware init ...",16); 
-     delay_ms(500);
-    
-    
-    
+       OLED_ShowString(0,0,"Hardware init ...",16); 
+     delay_ms(5000);
 		OLED_Clear(0); 
     Uart3_SU03T_SendCMD2(0x01);//播报硬件初始化成功
     OLED_ShowString(0,0,"Hardware init OK",16); 
@@ -188,10 +184,15 @@ void Display2_Init(void)
 	      OLED_ShowCHinese(0,2,20);//甲
 		  	OLED_ShowCHinese(16,2,21);//烷
 				OLED_ShowChar(32,2,':',16);
+        
+        if(CH4_flag==1)
+        {
+          MQ4.ADC_Value = Get_Adc_Average(ADC_Channel_0,10);//甲烷传感器ADC的值（模拟量）
+          MQ4_PPM_Calibration();
+          MQ4.CH4 = MQ4_GetPPM();//甲烷的浓度ppm的值
+        }else MQ4.CH4=0;
 				
-			  MQ4.ADC_Value = Get_Adc_Average(ADC_Channel_0,10);//甲烷传感器ADC的值（模拟量）
-				MQ4_PPM_Calibration();
-				MQ4.CH4 = MQ4_GetPPM();//甲烷的浓度ppm的值
+			  
 				OLED_ShowNum(40,2,MQ4.CH4,3,16);//甲烷浓度
 				
 //        UsartPrintf(USART_DEBUG, " CH4: %d，MQ4.CH4： %d\r\n",CH4,MQ4.CH4);
@@ -223,9 +224,12 @@ void Display2_Init(void)
 				OLED_ShowCHinese(48,6,34);//碳
 				OLED_ShowCHinese(64,6,35);//：
 				
-				MQ7.ADC_Value = Get_Adc_Average(ADC_Channel_4,10);//烟雾传感器ADC的值（模拟量）
-				MQ7_PPM_Calibration();
-				MQ7.CO= MQ7_GetPPM();//一氧化碳的浓度ppm的值
+        if(CO_flag==1)
+        {
+         	MQ7.ADC_Value = Get_Adc_Average(ADC_Channel_4,10);//烟雾传感器ADC的值（模拟量）
+          MQ7_PPM_Calibration();
+          MQ7.CO= MQ7_GetPPM();//一氧化碳的浓度ppm的值
+        }else MQ7.CO=0;
 				OLED_ShowNum(72,6,MQ7.CO,3,16);//一氧化碳浓度
 
       
@@ -238,48 +242,61 @@ void Display2_Init(void)
 				System_Flag = 93;
   
 }
+
+// 在全局变量定义处定义一个计时器变量
+uint32_t voice_timer = 49;
+
 void Refresh_Data(void)
 {
-        MQ4.ADC_Value =  Get_Adc_Average(ADC_Channel_0,10);//烟雾传感器ADC的值（模拟量）
-				MQ4.CH4 = MQ4_GetPPM();//一氧化碳的浓度ppm的值
-				
-				MQ7.ADC_Value =  Get_Adc_Average(ADC_Channel_4,10);//烟雾传感器ADC的值（模拟量）
-				MQ7.CO = MQ7_GetPPM();//一氧化碳的浓度ppm的值
-				
-				MQ8.ADC_Value =  Get_Adc_Average(ADC_Channel_1,10);//烟雾传感器ADC的值（模拟量）
-				MQ8.H2 = MQ8_GetPPM();//一氧化碳的浓度ppm的值
-				
-//			UsartPrintf(USART_DEBUG, " MQ4 ADCVALUE: %d： \r\n",MQ4.ADC_Value);
-//					delay_ms(1000);
-        
-        
+    if(CH4_flag==1)
+    {
+       MQ4.ADC_Value =  Get_Adc_Average(ADC_Channel_0,10);
+       MQ4.CH4 = MQ4_GetPPM();
+    }
+    else MQ4.CH4=0;
+      
+    if(CO_flag==1)
+    {
+       MQ7.ADC_Value =  Get_Adc_Average(ADC_Channel_4,10);
+       MQ7.CO = MQ7_GetPPM();
+    }
+    else MQ7.CO=0;
+    
+    if(H2_flag==1)
+    {
+        MQ8.ADC_Value =  Get_Adc_Average(ADC_Channel_1,10);
+        MQ8.H2 = MQ8_GetPPM();
+    }
+    else MQ8.H2=0;
+    
+    OLED_ShowNum(40,2,MQ4.CH4,3,16);
+    OLED_ShowNum(104,2,MQ8.H2,3,16);
+    OLED_ShowNum(72,4,JW_Value,3,16);
+    OLED_ShowNum(72,6,MQ7.CO,3,16);
+    
+    // 计时器递增
+    voice_timer++;
   
-  
-  
-  
-  
-				OLED_ShowNum(40,2,MQ4.CH4,3,16);//电压值
-				
-				OLED_ShowNum(104,2,MQ8.H2,3,16);//电压值
-				
-			  OLED_ShowNum(72,4,JW_Value,3,16);//电压值
-				
-				OLED_ShowNum(72,6,MQ7.CO,3,16);//电压值
-//				OLED_ShowNum(48,6,ADC_Value,4,16);//电压值（调试用）
+    // 每20秒触发一次语音播报
+    if(voice_timer == 60)
+    {
+      
+
+       Uart3_SU03T_alarm();
+        voice_timer = 0;
+    }
 }
 void SNR8016_Handle(void)
 {
   if(USART3_RX_STA == 1)
    {
-      UsartPrintf(USART_DEBUG,"消息：%d\r\n",USART3_RX_CMD);
-      delay_ms(500);
       switch(USART3_RX_CMD)
       {
         //关闭警报
         case 0x01:
            flag=0;
            Beep_Set(BEEP_OFF);
-           GPIO_SetBits(GPIOC,GPIO_Pin_13);
+           Led_Set(LED_OFF);
           break ;
         //打开报警功能
         case 0x02:
@@ -290,20 +307,73 @@ void SNR8016_Handle(void)
           CH4_max=21;
            break;
         case 0x04:
-          H2_max=24;
+          CH4_flag=0;
            break;
         case 0x05:
           CO_max=27;
-           break;
+          break;
         case 0x06:
-          SU03T_DHT11_Play();
-			 
-                delay_ms(1000);
-         //发送传感器浓度
-           break;
+          CO_flag=0;
+          break;
         case 0x07:
-         CO2_max=450;
+          CO2_max=55;
+          break;
+         case 0x08:
+          CO2_flag=0;
+          break;
+         case 0x09:
+          H2_max=24;
+          break;
+         case 0x00:
+          H2_flag=0;
+          break;
+         case 0x0B:
+          CH4_flag=1;
+          break;
+         case 0x0C:
+          CO2_flag=1;
+          break;
+         case 0x0D:
+          CO_flag=1;
+          break;
+         case 0x0E:
+          H2_flag=1;
+          break;
+         case 0x10:
+         alarm_CH4=1;
+          break;
+         case 0x11:
+         alarm_H2=1;
+          break;
+         case 0x12:
+         alarm_CO=1;
+          break;
+         case 0x13:
+         alarm_CO2=1;
+          break;
+         case 0x14:
+         alarm_CH4=0;
+          break;
+         case 0x15:
+         alarm_H2=0;
+          break;
+         case 0x16:
+         alarm_CO=0;
+          break;
+         case 0x17:
+         alarm_CO2=0;
+          break;
+      
+   
+     //发送传感器浓度,阈值
+        case 0x0A:
+          SU03T_DHT11_Play();
+     
+
+
            break;
+       
+
      }	
    }  
 

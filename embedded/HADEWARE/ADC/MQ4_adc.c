@@ -1,7 +1,17 @@
 #include "adc.h"
 #include "delay.h"		 
 #include "math.h"
-//初始化ADC						
+//初始化ADC			
+int alarm_CH4=1;
+int alarm_CO=1;
+int alarm_H2=1;
+
+int CH4_flag=1;
+int CO_flag=1;
+int H2_flag=1;
+uint16_t CH4_max=17;
+uint16_t H2_max=23;
+uint16_t CO_max=25;
 
  unsigned int CH4;
  uint16_t MQ4_ADC_Value;
@@ -13,6 +23,8 @@
  unsigned int CO;
  uint16_t MQ7_ADC_Value;
   MQ7_Sensor MQ7;
+
+
 
 void initialize_MQ4(MQ4_Sensor *sensor, uint16_t adc_value,unsigned int CH4) {
     sensor->R0 = MQ4_R0;  

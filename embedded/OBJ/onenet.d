@@ -43,6 +43,7 @@
 ..\obj\onenet.o: ..\HADEWARE\BEEP\beep.h
 ..\obj\onenet.o: ..\HADEWARE\LED\led.h
 ..\obj\onenet.o: ..\HADEWARE\TIMER\timer.h
+..\obj\onenet.o: ..\HADEWARE\ADC\JW.H
 ..\obj\onenet.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\onenet.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\onenet.o: ..\CJSON\cJSON.h

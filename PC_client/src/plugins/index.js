@@ -1,5 +1,4 @@
 import service from "@/plugins/axios";
-const { createCommonToken } = require('./key.js');
 export const loginAPI = (userId, password) => {
     const url = `http://8.130.146.112:8099/user/login?userId=${userId}&passwd=${password}`;
     // 发起网络请求
@@ -54,18 +53,13 @@ export const ErrorInfoAPI = () => {
     });
 }
 
-const token = createCommonToken({
-    author_key: 'BGjW9C6BkVrAyiyIK9gGihC/aiVZpACBsNKeW1dvXifY3jCbAqO5AvydhSum7X+3c86hRjvl/T/7OUpoSN1OOg==',
-    version: '2022-05-01',
-    user_id: '376681'
-});
 
 export const changeValueAPI = (CH4,H2,CO,CO2) => {
     let key_th = {
-        CH4_max: CH4,
-        H2_max: H2,
-        CO_max: CO,
-        CO2_max: CO2,
+        CH4_max: parseInt(CH4),
+        H2_max: parseInt(H2),
+        CO_max: parseInt(CO),
+        CO2_max: parseInt(CO2),
     };
     const url =`https://iot-api.heclouds.com/thingmodel/set-device-property`;
     return service({
@@ -77,7 +71,7 @@ export const changeValueAPI = (CH4,H2,CO,CO2) => {
             params: key_th
         },
         headers: {
-            'authorization': token //自定义请求头信息
+            'authorization': 'version=2022-05-01&res=userid%2F376681&et=1744899837&method=sha1&sign=rLGWwiRM8saWyc%2F%2FnjBtjsd2SUg%3D' //自定义请求头信息
         }
     }).then(response => {
         console.log('请求成功，响应数据为：', response.data);
@@ -105,7 +99,7 @@ export const changeSwitchAPI = (CH4,H2,CO,CO2) => {
             params: key_th
         },
         headers: {
-            'authorization': token //自定义请求头信息
+            'authorization': 'BGjW9C6BkVrAyiyIK9gGihC/aiVZpACBsNKeW1dvXifY3jCbAqO5AvydhSum7X+3c86hRjvl/T/7OUpoSN1OOg==' //自定义请求头信息
         }
     }).then(response => {
         console.log('请求成功，响应数据为：', response.data);

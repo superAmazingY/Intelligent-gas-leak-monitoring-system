@@ -16,10 +16,10 @@ export default {
   data() {
     return {
       sensors: [
-        { name: '一氧化碳传感器', value: this.$store.state.CO_value, max: 50, type: 'CO', label: '当前一氧化碳上限', switchValue: this.$store.state.switch_CO, switchType: 'CO' },
-        { name: '二氧化碳传感器', value: this.$store.state.CO2_value, max: 80, type: 'CO2', label: '当前二氧化碳上限', switchValue: this.$store.state.switch_CO2, switchType: 'CO2' },
-        { name: '甲烷传感器', value: this.$store.state.CH4_value, max: 50, type: 'CH4', label: '当前甲烷上限', switchValue: this.$store.state.switch_CH4, switchType: 'CH4' },
-        { name: '氢气传感器', value: this.$store.state.H2_value, max: 50, type: 'H2', label: '当前氢气上限', switchValue: this.$store.state.switch_H2, switchType: 'H2' },
+        { name: '一氧化碳传感器', value: this.$store.state.CO_value, max: 50, type: 'CO', label: '当前一氧化碳阈值', switchValue: this.$store.state.switch_CO, switchType: 'CO' },
+        { name: '二氧化碳传感器', value: this.$store.state.CO2_value, max: 80, type: 'CO2', label: '当前二氧化碳阈值', switchValue: this.$store.state.switch_CO2, switchType: 'CO2' },
+        { name: '甲烷传感器', value: this.$store.state.CH4_value, max: 50, type: 'CH4', label: '当前甲烷阈值', switchValue: this.$store.state.switch_CH4, switchType: 'CH4' },
+        { name: '氢气传感器', value: this.$store.state.H2_value, max: 50, type: 'H2', label: '当前氢气阈值', switchValue: this.$store.state.switch_H2, switchType: 'H2' },
       ]
     }
   },
@@ -62,7 +62,6 @@ export default {
 
 };
 </script>
-
 
 <style scoped>
 .card-container {

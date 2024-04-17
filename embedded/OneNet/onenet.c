@@ -40,6 +40,7 @@
 #include "beep.h"
 #include "led.h"
 #include "timer.h"
+#include  "JW.H"
 //C库
 #include <string.h>
 #include <stdio.h>
@@ -380,7 +381,7 @@ _Bool OneNet_DevLink(void)
 unsigned char OneNet_FillBuf(char *buf)
 {
 	
-	char text[48];
+	char text[300];
 	
 	memset(text, 0, sizeof(text));
 	
@@ -407,11 +408,37 @@ unsigned char OneNet_FillBuf(char *buf)
 	sprintf(text, "\"H2\":{\"value\":%d},",MQ8.H2);
 	strcat(buf, text);
   
+  if(MQ4.CH4>=CH4_max)
+  {
+    memset(text, 0, sizeof(text));
+    	sprintf(text, "\"alarm_info\":{\"value\":\"%s\"},","CH4");
+  
+    strcat(buf, text);
+  }else if(MQ7.CO>=CO_max)
+  {
+    memset(text, 0, sizeof(text));
+    	sprintf(text, "\"alarm_info\":{\"value\":\"%s\"},","CO");
+    strcat(buf, text);
+  }else if(MQ8.H2>=H2_max)
+  {
+    memset(text, 0, sizeof(text));
+    	sprintf(text, "\"alarm_info\":{\"value\":\"%s\"},","H2");
+    strcat(buf, text);
+  }else if(MQ4.CH4<CH4_max&&MQ8.H2<H2_max&&MQ7.CO<CO_max)
+  {
+   
+
+    memset(text, 0, sizeof(text));
+   	sprintf(text, "\"alarm_info\":{\"value\":\"%s\"},","NONE");
+    strcat(buf, text);
+  }
 	memset(text, 0, sizeof(text));
 	sprintf(text, "\"led\":{\"value\":%s}", beep_info.Beep_Status ? "true" : "false");
 	strcat(buf, text);
 //	UsartPrintf(USART_DEBUG, "Led_Status:%s\r\n",led_info.Led_Status ? "true" : "false");
 
+
+  
 	strcat(buf, "}}");
 	
 	return strlen(buf);
@@ -434,7 +461,7 @@ void OneNet_SendData(void)
 	
 	MQTT_PACKET_STRUCTURE mqttPacket = {NULL, 0, 0, 0};												//协议包
 	
-	char buf[256];
+	char buf[400];
 	
 	short body_len = 0, i = 0;
 	
@@ -535,87 +562,98 @@ void OneNET_Subscribe(void)
 //==========================================================
 void OneNet_RevPro(unsigned char *cmd)
 {
-	
-	char *req_payload = NULL;
-	char *cmdid_topic = NULL;
-	
-	unsigned short topic_len = 0;
-	unsigned short req_len = 0;
-	
-	unsigned char qos = 0;
-	static unsigned short pkt_id = 0;
-	
-	unsigned char type = 0;
-	
-	short result = 0;
-
-
-
-
-	cJSON *raw_json, *params_json, *led_json,*beep_json;
-	type = MQTT_UnPacketRecv(cmd);
-  UsartPrintf(USART_DEBUG, "OneNet_RevPro\r\n");
-	switch(type)
-	{
-		case MQTT_PKT_PUBLISH:																//接收的Publish消息
-		
-			result = MQTT_UnPacketPublish(cmd, &cmdid_topic, &topic_len, &req_payload, &req_len, &qos, &pkt_id);
-			if(result == 0)
-			{
-		
-				
-				UsartPrintf(USART_DEBUG, "topic: %s, topic_len: %d, payload: %s, payload_len: %d\r\n",
-																	cmdid_topic, topic_len, req_payload, req_len);
-				raw_json = cJSON_Parse(req_payload);
-				params_json = cJSON_GetObjectItem(raw_json,"params");
-        
-//				led_json = cJSON_GetObjectItem(params_json,"led");
-//				if(led_json != NULL)
-//				{
-//					if(led_json->type == cJSON_True) Led_Set(LED_ON);
-//					else Led_Set(LED_OFF);
-//				}
-        beep_json = cJSON_GetObjectItem(params_json,"BEEP");
-        led_json = cJSON_GetObjectItem(params_json,"led");
-
-        if(beep_json != NULL) {
-            UsartPrintf(USART_DEBUG, "beep\r\n");
-            if(beep_json->type == cJSON_True) {Beep_Set(BEEP_ON);flag=1;}
-            else {Beep_Set(BEEP_OFF);flag=0;}
-        }
-
-        if(led_json != NULL) {
-            UsartPrintf(USART_DEBUG, "led\r\n");
-            if(led_json->type == cJSON_True) {Led_Set(LED_ON);flag=1;}
-            else {Led_Set(LED_OFF);flag=0;}
-        }
+    char *req_payload = NULL;
+    char *cmdid_topic = NULL;
     
-      
-				
-				cJSON_Delete(raw_json);
+    unsigned short topic_len = 0;
+    unsigned short req_len = 0;
+    
+    unsigned char qos = 0;
+    static unsigned short pkt_id = 0;
+    
+    unsigned char type = 0;
+    
+    short result = 0;
 
-			}
-			
-		case MQTT_PKT_PUBACK:														//发送Publish消息，平台回复的Ack
-		
-			if(MQTT_UnPacketPublishAck(cmd) == 0)
-				UsartPrintf(USART_DEBUG, "Tips:	MQTT Publish Send OK\r\n");
-			
-		break;
-		
-		case MQTT_PKT_SUBACK:																//发送Subscribe消息的Ack
-		
-			if(MQTT_UnPacketSubscribe(cmd) == 0)
-				UsartPrintf(USART_DEBUG, "Tips:	MQTT Subscribe OK\r\n");
-			else
-				UsartPrintf(USART_DEBUG, "Tips:	MQTT Subscribe Err\r\n");
-		
-		break;
-		
-		default:
-			result = -1;
-		break;
-	}
+    cJSON *raw_json, *params_json, *led_json, *beep_json, *CH4_th_json,*CO_th_json,*CO2_th_json,*H2_th_json;
+    type = MQTT_UnPacketRecv(cmd);
+    UsartPrintf(USART_DEBUG, "OneNet_RevPro\r\n");
+    switch(type)
+    {
+        case MQTT_PKT_PUBLISH:
+            result = MQTT_UnPacketPublish(cmd, &cmdid_topic, &topic_len, &req_payload, &req_len, &qos, &pkt_id);
+            if(result == 0)
+            {
+                UsartPrintf(USART_DEBUG, "topic: %s, topic_len: %d, payload: %s, payload_len: %d\r\n",
+                            cmdid_topic, topic_len, req_payload, req_len);
+                raw_json = cJSON_Parse(req_payload);
+                if (raw_json == NULL) {
+                    UsartPrintf(USART_DEBUG, "Failed to parse JSON\r\n");
+                    break;
+                }
+                params_json = cJSON_GetObjectItem(raw_json,"params");
+                if (params_json != NULL) {
+                    beep_json = cJSON_GetObjectItem(params_json,"BEEP");
+                    led_json = cJSON_GetObjectItem(params_json,"led");
+                    CH4_th_json = cJSON_GetObjectItem(params_json,"CH4_max");
+                    CO_th_json = cJSON_GetObjectItem(params_json,"CO_max");
+                    CO2_th_json = cJSON_GetObjectItem(params_json,"CO2_max");
+                    H2_th_json = cJSON_GetObjectItem(params_json,"H2_max");
+
+                    if(beep_json != NULL) {
+                        UsartPrintf(USART_DEBUG, "beep\r\n");
+                        Beep_Set(beep_json->valueint ? BEEP_ON : BEEP_OFF);
+                    }
+
+                    if(led_json != NULL) {
+                        UsartPrintf(USART_DEBUG, "led\r\n");
+                        Led_Set(led_json->valueint ? LED_ON : LED_OFF);
+                    }
+                      
+                    if(CH4_th_json != NULL) {
+                        CH4_max = CH4_th_json->valueint;                        
+                    }
+                   
+                    if(H2_th_json != NULL) {
+                      
+
+                        H2_max = H2_th_json->valueint;    
+                
+                    }
+                   
+                    if(CO_th_json != NULL) {
+                       
+                        CO_max = CO_th_json->valueint; 
+                                       
+                    }
+                  
+                    if(CO2_th_json != NULL) {
+                        CO2_max = CO2_th_json->valueint;     
+                                       
+                    }
+                }
+                cJSON_Delete(raw_json);
+            }
+            break;
+
+        case MQTT_PKT_PUBACK:
+            if(MQTT_UnPacketPublishAck(cmd) == 0) {
+                UsartPrintf(USART_DEBUG, "Tips: MQTT Publish Send OK\r\n");
+            }
+            break;
+
+        case MQTT_PKT_SUBACK:
+            if(MQTT_UnPacketSubscribe(cmd) == 0) {
+                UsartPrintf(USART_DEBUG, "Tips: MQTT Subscribe OK\r\n");
+            } else {
+                UsartPrintf(USART_DEBUG, "Tips: MQTT Subscribe Err\r\n");
+            }
+            break;
+
+        default:
+            result = -1;
+            break;
+    }
 	
 	
 	ESP8266_Clear();									//清空缓存

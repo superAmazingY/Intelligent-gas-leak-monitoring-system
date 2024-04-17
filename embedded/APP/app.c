@@ -8,17 +8,23 @@
 #include "JW.h"
 #include "adc.h"
 
+
+
+
+
+
+
 void Hardware_Init(void)
 {
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//ï¿½Ð¶Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//ÖÐ¶Ï¿ØÖÆÆ÷·Ö×éÉèÖÃ
 
   TIM4_Init();
   delay_init();
   
-	Usart1_Init(9600);							//ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½Ó¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½CO2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Usart1_Init(9600);							//´®¿Ú1£¬´òÓ¡ÐÅÏ¢ÓÃÒÔ¼°³õÊ¼»¯CO2´«¸ÐÆ÷
 	
-	Usart2_Init(115200);							//ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ESP8266ï¿½ï¿½
+	Usart2_Init(115200);							//´®¿Ú2£¬Çý¶¯ESP8266ÓÃ
 	
   Usart3_Init(115200);	
   
@@ -31,7 +37,7 @@ void Hardware_Init(void)
 	LED_Init();
 
 		Beep_Init();
-		Adc_Init();		  		//ADCï¿½ï¿½Ê¼ï¿½ï¿½
+		Adc_Init();		  		//ADC³õÊ¼»¯
   
 		OLED_Init();
     
@@ -53,7 +59,7 @@ void Display1_Init(void)
 	OLED_ShowString(0,4,"Connect MQTT Server Success",16); delay_ms(5000);
 
 	OLED_Clear(0); OLED_ShowString(0,0,"Device login ...",16);delay_ms(5000);
-	while(OneNet_DevLink())			//ï¿½ï¿½ï¿½ï¿½OneNET
+	while(OneNet_DevLink())			//½ÓÈëOneNET
 	{
 		ESP8266_SendCmd(ESP8266_ONENET_INFO, "CONNECT");
 		delay_ms(500);
@@ -62,76 +68,76 @@ void Display1_Init(void)
   
   OLED_Clear(0);
   delay_ms(2000);
-	OLED_ShowCHinese(16-8,2,0);//ï¿½ï¿½
-	OLED_ShowCHinese(32-8,2,1);//ï¿½ï¿½
-	OLED_ShowCHinese(48-8,2,2);//ï¿½ï¿½
-	OLED_ShowCHinese(64-8,2,3);//ï¿½ï¿½
-	OLED_ShowCHinese(80-8,2,4);//ï¿½ï¿½
+	OLED_ShowCHinese(16-8,2,0);//´«
+	OLED_ShowCHinese(32-8,2,1);//¸Ð
+	OLED_ShowCHinese(48-8,2,2);//Æ÷
+	OLED_ShowCHinese(64-8,2,3);//Õý
+	OLED_ShowCHinese(80-8,2,4);//ÔÚ
 	OLED_ShowCHinese(96-8,2,5);//Ô¤
-	OLED_ShowCHinese(112-8,2,6);//ï¿½ï¿½
-	OLED_ShowCHinese(16,5,7);//ï¿½ï¿½
-	OLED_ShowCHinese(32,5,8);//ï¿½ï¿½
-	OLED_ShowCHinese(48,5,9);//ï¿½ï¿½
-	OLED_ShowCHinese(64,5,10);//ï¿½ï¿½
-	OLED_ShowCHinese(96,5,11);//ï¿½ï¿½
+	OLED_ShowCHinese(112-8,2,6);//ÈÈ
+	OLED_ShowCHinese(16,5,7);//Çë
+	OLED_ShowCHinese(32,5,8);//µÈ
+	OLED_ShowCHinese(48,5,9);//´ý
+	OLED_ShowCHinese(64,5,10);//£º
+	OLED_ShowCHinese(96,5,11);//Ãë
   
 }
 
 void Display2_Init(void)
 {
-  	//ï¿½ï¿½Ò»ï¿½ï¿½
-				OLED_ShowCHinese(0,0,12);//ï¿½ï¿½
-				OLED_ShowCHinese(16,0,13);//ï¿½ï¿½
-				OLED_ShowCHinese(32,0,14);//ï¿½ï¿½
-				OLED_ShowCHinese(48,0,15);//ï¿½ï¿½
-				OLED_ShowCHinese(64,0,16);//ï¿½ï¿½
-				OLED_ShowCHinese(80,0,17);//ï¿½ï¿½
+  	//µÚÒ»ÐÐ
+				OLED_ShowCHinese(0,0,12);//Æø
+				OLED_ShowCHinese(16,0,13);//Ìå
+				OLED_ShowCHinese(32,0,14);//¼à
+				OLED_ShowCHinese(48,0,15);//²â
+				OLED_ShowCHinese(64,0,16);//¿Ø
+				OLED_ShowCHinese(80,0,17);//ÖÆ
 				OLED_ShowCHinese(96,0,18);//Ïµ
 			  OLED_ShowCHinese(112,0,19);//Í³
-					//ï¿½Ú¶ï¿½ï¿½ï¿½
+					//µÚ¶þÐÐ
 				
-	      OLED_ShowCHinese(0,2,20);//ï¿½ï¿½
-		  	OLED_ShowCHinese(16,2,21);//ï¿½ï¿½
+	      OLED_ShowCHinese(0,2,20);//¼×
+		  	OLED_ShowCHinese(16,2,21);//Íé
 				OLED_ShowChar(32,2,':',16);
 				
-			  MQ4.ADC_Value = Get_Adc_Average(ADC_Channel_0,10);//ï¿½ï¿½ï¿½é´«ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			  MQ4.ADC_Value = Get_Adc_Average(ADC_Channel_0,10);//¼×Íé´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
 				MQ4_PPM_Calibration();
-				MQ4.CH4 = MQ4_GetPPM();//ï¿½ï¿½ï¿½ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
-				OLED_ShowNum(40,2,MQ4.CH4,3,16);//ï¿½ï¿½ï¿½ï¿½Å¨ï¿½ï¿½
+				MQ4.CH4 = MQ4_GetPPM();//¼×ÍéµÄÅ¨¶ÈppmµÄÖµ
+				OLED_ShowNum(40,2,MQ4.CH4,3,16);//¼×ÍéÅ¨¶È
 				
-        UsartPrintf(USART_DEBUG, " CH4: %dï¿½ï¿½MQ4.CH4ï¿½ï¿½ %d\r\n",CH4,MQ4.CH4);
+        UsartPrintf(USART_DEBUG, " CH4: %d£¬MQ4.CH4£º %d\r\n",CH4,MQ4.CH4);
         
-				OLED_ShowCHinese(64,2,23);//ï¿½ï¿½
-				OLED_ShowCHinese(80,2,24);//ï¿½ï¿½
+				OLED_ShowCHinese(64,2,23);//Çâ
+				OLED_ShowCHinese(80,2,24);//Æø
 				OLED_ShowChar(96,2,':',16);
 				
-				MQ8.ADC_Value = Get_Adc_Average(ADC_Channel_1,10);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				MQ8.ADC_Value = Get_Adc_Average(ADC_Channel_1,10);//ÇâÆø´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
 				MQ8_PPM_Calibration();
-				MQ8.H2 = MQ8_GetPPM();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
-				OLED_ShowNum(104,2,MQ8.H2,3,16);//ï¿½ï¿½ï¿½ï¿½Å¨ï¿½ï¿½
+				MQ8.H2 = MQ8_GetPPM();//ÇâÆøµÄÅ¨¶ÈppmµÄÖµ
+				OLED_ShowNum(104,2,MQ8.H2,3,16);//ÇâÆøÅ¨¶È
 						
-					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-				OLED_ShowCHinese(0,4,26);//ï¿½ï¿½
-				OLED_ShowCHinese(16,4,27);//ï¿½ï¿½
-				OLED_ShowCHinese(32,4,28);//ï¿½ï¿½
+					//µÚÈýÐÐ
+				OLED_ShowCHinese(0,4,26);//¶þ
+				OLED_ShowCHinese(16,4,27);//Ñõ
+				OLED_ShowCHinese(32,4,28);//»¯
 				OLED_ShowCHinese(48,4,29);//Ì¼
-				OLED_ShowCHinese(64,4,30);//ï¿½ï¿½
-				OLED_ShowNum(72,4,JW_Value,3,16);//ï¿½ï¿½Ñ¹Öµ
+				OLED_ShowCHinese(64,4,30);//£º
+				OLED_ShowNum(72,4,JW_Value,3,16);//µçÑ¹Öµ
 				
 		
 				
 				OLED_ShowString(96,5,"PPM",3);
-				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				//µÚËÄÐÐ
 				OLED_ShowCHinese(0,6,31);//Ò»
-				OLED_ShowCHinese(16,6,32);//ï¿½ï¿½
-				OLED_ShowCHinese(32,6,33);//ï¿½ï¿½
+				OLED_ShowCHinese(16,6,32);//Ñõ
+				OLED_ShowCHinese(32,6,33);//»¯
 				OLED_ShowCHinese(48,6,34);//Ì¼
-				OLED_ShowCHinese(64,6,35);//ï¿½ï¿½
+				OLED_ShowCHinese(64,6,35);//£º
 				
-				MQ7.ADC_Value = Get_Adc_Average(ADC_Channel_4,10);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				MQ7.ADC_Value = Get_Adc_Average(ADC_Channel_4,10);//ÑÌÎí´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
 				MQ7_PPM_Calibration();
-				MQ7.CO= MQ7_GetPPM();//Ò»ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
-				OLED_ShowNum(72,6,MQ7.CO,3,16);//Ò»ï¿½ï¿½ï¿½ï¿½Ì¼Å¨ï¿½ï¿½
+				MQ7.CO= MQ7_GetPPM();//Ò»Ñõ»¯Ì¼µÄÅ¨¶ÈppmµÄÖµ
+				OLED_ShowNum(72,6,MQ7.CO,3,16);//Ò»Ñõ»¯Ì¼Å¨¶È
 
       
 
@@ -139,7 +145,7 @@ void Display2_Init(void)
 				
 				
 				
-//				OLED_ShowNum(48,6,ADC_Value,4,16);//ï¿½ï¿½Ñ¹Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½
+//				OLED_ShowNum(48,6,ADC_Value,4,16);//µçÑ¹Öµ£¨µ÷ÊÔÓÃ£©
 				System_Flag = 93;
   
 }
@@ -147,25 +153,25 @@ void Display2_Init(void)
 void Refresh_Data(void)
 {
   
-        MQ4.ADC_Value =  Get_Adc_Average(ADC_Channel_0,10);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-				MQ4.CH4 = MQ4_GetPPM();//Ò»ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
+        MQ4.ADC_Value =  Get_Adc_Average(ADC_Channel_0,10);//ÑÌÎí´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
+				MQ4.CH4 = MQ4_GetPPM();//Ò»Ñõ»¯Ì¼µÄÅ¨¶ÈppmµÄÖµ
 				
-				MQ7.ADC_Value =  Get_Adc_Average(ADC_Channel_4,10);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-				MQ7.CO = MQ7_GetPPM();//Ò»ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
+				MQ7.ADC_Value =  Get_Adc_Average(ADC_Channel_4,10);//ÑÌÎí´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
+				MQ7.CO = MQ7_GetPPM();//Ò»Ñõ»¯Ì¼µÄÅ¨¶ÈppmµÄÖµ
 				
-				MQ8.ADC_Value =  Get_Adc_Average(ADC_Channel_1,10);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADCï¿½ï¿½Öµï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-				MQ8.H2 = MQ8_GetPPM();//Ò»ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ï¿½Å¨ï¿½ï¿½ppmï¿½ï¿½Öµ
+				MQ8.ADC_Value =  Get_Adc_Average(ADC_Channel_1,10);//ÑÌÎí´«¸ÐÆ÷ADCµÄÖµ£¨Ä£ÄâÁ¿£©
+				MQ8.H2 = MQ8_GetPPM();//Ò»Ñõ»¯Ì¼µÄÅ¨¶ÈppmµÄÖµ
 				
-//			UsartPrintf(USART_DEBUG, " MQ4 ADCVALUE: %dï¿½ï¿½ \r\n",MQ4.ADC_Value);
+//			UsartPrintf(USART_DEBUG, " MQ4 ADCVALUE: %d£º \r\n",MQ4.ADC_Value);
 //					delay_ms(1000);
         
 
-				OLED_ShowNum(40,2,MQ4.CH4,3,16);//ï¿½ï¿½Ñ¹Öµ
+				OLED_ShowNum(40,2,MQ4.CH4,3,16);//µçÑ¹Öµ
 				
-				OLED_ShowNum(104,2,MQ8.H2,3,16);//ï¿½ï¿½Ñ¹Öµ
+				OLED_ShowNum(104,2,MQ8.H2,3,16);//µçÑ¹Öµ
 				
-			  OLED_ShowNum(72,4,JW_Value,3,16);//ï¿½ï¿½Ñ¹Öµ
+			  OLED_ShowNum(72,4,JW_Value,3,16);//µçÑ¹Öµ
 				
-				OLED_ShowNum(72,6,MQ7.CO,3,16);//ï¿½ï¿½Ñ¹Öµ
-//				OLED_ShowNum(48,6,ADC_Value,4,16);//ï¿½ï¿½Ñ¹Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½
+				OLED_ShowNum(72,6,MQ7.CO,3,16);//µçÑ¹Öµ
+//				OLED_ShowNum(48,6,ADC_Value,4,16);//µçÑ¹Öµ£¨µ÷ÊÔÓÃ£©
 }

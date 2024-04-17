@@ -132,9 +132,9 @@
         H2:'',
         led:true,
 		CH4_max:'17',
-		CO_max:'20',
+		CO_max:'23',
 		CO2_max:'45',
-		H2_max:'22',
+		H2_max:'25',
         token: '',
       }
     },
@@ -168,11 +168,11 @@
             console.log(res.data);
             this.BEEP=res.data.data[0].value==='true';
             this.CH4=res.data.data[1].value;
-            this.CO=res.data.data[2].value;
-            this.CO2=res.data.data[3].value;
-            this.H2=res.data.data[4].value;
+            this.CO=res.data.data[3].value;
+            this.CO2=res.data.data[4].value;
+            this.H2=res.data.data[7].value;
             //console.log(res.data.data[5].value);
-            this.led=res.data.data[5].value==='true';
+            this.led=res.data.data[10].value==='true';
           }
         });
       },
@@ -260,6 +260,7 @@
 	  		// 请求成功，打印提示信息，主要用于调试，可自定义
 	  		success: () => {
 	  			console.log(this.key_th);
+				console.log(this.token);
 	  		}
 	  	});
 	  }

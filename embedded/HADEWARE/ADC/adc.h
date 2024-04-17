@@ -9,6 +9,17 @@
 
 //MQ4
 static float MQ4_R0;
+extern uint16_t CH4_max;
+extern uint16_t H2_max;
+extern uint16_t CO_max;
+
+extern int alarm_CH4;
+extern int alarm_CO;
+extern int alarm_H2;
+
+extern int CH4_flag;
+extern int H2_flag;
+extern int CO_flag;
 
 
 typedef struct {

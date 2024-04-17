@@ -21,7 +21,7 @@
 //硬件驱动
 #include "usart.h"
 #include "delay.h"
-
+#include "timer.h"
 
 //C库
 #include <stdarg.h>
@@ -364,12 +364,17 @@ void SU03T_DHT11_Play(void)
     u8 t = 0;
     if(t % 10 == 0) //每10ms读取一次
     {
-     Uart3_SU03T_SendCMD1(0X04, MQ4.CH4); /*(甲烷)上传给SU-03T进行处理*/
-     UsartPrintf(USART_DEBUG,"甲烷传值：%d\r\n",MQ4.CH4);
-
-     Uart3_SU03T_SendCMD1(0X05, MQ8.H2); /*(甲烷)上传给SU-03T进行处理*/
-     Uart3_SU03T_SendCMD1(0X06, MQ7.CO); /*(甲烷)上传给SU-03T进行处理*/
-     Uart3_SU03T_SendCMD1(0X07, JW_Value); /*(甲烷)上传给SU-03T进行处理*/   
+     Uart3_SU03T_SendCMD1(0X05, MQ4.CH4); /*(甲烷)上传给SU-03T进行处理*/
+     Uart3_SU03T_SendCMD1(0X06,CH4_max); /*(甲烷阈值)上传给SU-03T进行处理*/
+      
+     Uart3_SU03T_SendCMD1(0X07,MQ7.CO);  
+     Uart3_SU03T_SendCMD1(0X08,CO_max); 
+      
+     Uart3_SU03T_SendCMD1(0X09,JW_Value);
+     Uart3_SU03T_SendCMD1(0X0A,CO2_max);  //消息号10
+      
+     Uart3_SU03T_SendCMD1(0X0B,MQ8.H2);
+     Uart3_SU03T_SendCMD1(0X0C,H2_max);
     }
      
     delay_ms(10);
@@ -380,6 +385,32 @@ void SU03T_DHT11_Play(void)
         t = 0;
     }
 
+}
+
+void Uart3_SU03T_alarm(void)
+{
+     
+
+        if(alarm_CH4==1&&MQ4.CH4>=CH4_max)
+        {
+          Uart3_SU03T_SendCMD1(0X05, MQ4.CH4);
+          Uart3_SU03T_SendCMD2(0X0D);
+         
+      
+        }else if(alarm_H2==1&&MQ8.H2>=H2_max)
+        {
+          Uart3_SU03T_SendCMD1(0X0B,MQ8.H2);
+          Uart3_SU03T_SendCMD2(0X0E);
+        
+      
+        }else if(alarm_CO==1&&MQ7.CO>=CO_max)
+        {
+        Uart3_SU03T_SendCMD1(0X07,MQ7.CO);
+        Uart3_SU03T_SendCMD2(0X0F);
+       
+        
+        }
+    
 }
 
 

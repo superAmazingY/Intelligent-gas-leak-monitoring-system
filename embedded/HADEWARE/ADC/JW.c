@@ -4,8 +4,9 @@
 
 #define    JW_ADDR                        0x2C
 #define    JW_DATA_LEN                    0x06
-
-
+uint16_t CO2_max = 75;
+int CO2_flag =1 ;
+int alarm_CO2=1 ;
 unsigned char Jw_Data_Start    =      false;
 unsigned char JW_Pos            =        0;
 unsigned int JW_Value          =        0;
@@ -61,11 +62,15 @@ void JW_Data_Analyze(void)
 //      UsartPrintf(USART_DEBUG,"JW_Receive_Data_Error: %02X,%02X,%02X,%02X%,%02X,%02X  Temp:%02X..\r\n",JW_Data_Buffer[0],JW_Data_Buffer[1],JW_Data_Buffer[2],JW_Data_Buffer[3],JW_Data_Buffer[4],JW_Data_Buffer[5],Temp);
         return;
     }
+    if(CO2_flag==1)
+    {
+      JW_Value = JW_Data_Buffer[1]*256 + JW_Data_Buffer[2];
+      JW_Value /=10;
+    }else JW_Value=0;
     
-    JW_Value = JW_Data_Buffer[1]*256 + JW_Data_Buffer[2];
 //    UsartPrintf(USART_DEBUG,"JW_Receive_Data_success:%02X,%02X,%02X,%02X%,%02X,%02X  Temp:%02X..\r\n",JW_Data_Buffer[0],JW_Data_Buffer[1],JW_Data_Buffer[2],JW_Data_Buffer[3],JW_Data_Buffer[4],JW_Data_Buffer[5],Temp);
 
-    UsartPrintf(USART_DEBUG,"JW_Receive_Data_Value:%d ppm\r\n",JW_Value);
+//    UsartPrintf(USART_DEBUG,"JW_Receive_Data_Value:%d ppm\r\n",JW_Value);
     
     
 }

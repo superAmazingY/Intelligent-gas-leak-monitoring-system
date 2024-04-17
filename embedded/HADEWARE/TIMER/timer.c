@@ -9,10 +9,8 @@ int Waring_Time ;//DAC输出的值。
 unsigned int System_Flag,System_Time;//系统标志位，系统运行时间
 int flag=1;
 unsigned int Sys_Tick_Timer;
-uint16_t CH4_max=17;
-uint16_t H2_max=20;
-uint16_t CO_max=20;
-uint16_t CO2_max=10000,CO2_MAX=1500;
+
+
 
 void TIM4_Init(void)//0.1ms定时当作整个系统的呼吸
 {
@@ -44,10 +42,10 @@ void TIM4_IRQHandler(void)//系统逻辑执行中断
 	{
 		if(++System_Time % 10000 == 0 && System_Flag <= 90){System_Flag++;Sec--;}//一氧化碳传感器上电需要预热一分半钟（5V电是1分钟）
     
-		if(System_Flag > 90&&flag==1)
+		if(System_Flag== 93&&flag==1)
 		{
 		
-      if(MQ4.CH4 >= CH4_max||MQ7.CO >= CO_max||MQ8.H2 >= H2_max)//CO值大于50则有危险，所以选在40-50为预警阶段
+      if((MQ4.CH4 >= CH4_max&&alarm_CH4==1)||(MQ7.CO >= CO_max&&alarm_CO==1)||(MQ8.H2 >= H2_max&&alarm_H2==1))//CO值大于50则有危险，所以选在40-50为预警阶段
 			{
 				Waring_Time++;
 				if(Waring_Time<=500)

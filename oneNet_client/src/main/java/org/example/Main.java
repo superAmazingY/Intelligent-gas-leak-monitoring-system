@@ -2,6 +2,7 @@ package org.example;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
@@ -83,7 +84,7 @@ public class Main {
     }
 
     // 生成Token的函数
-    public static String createToken(String authorKey, String userId, String version) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static String createToken(String authorKey, String userId, String version) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         String res = "userid/" + userId;
         long et = (System.currentTimeMillis() + 365 * 24 * 3600 * 1000) / 1000;
         String method = "sha1";
@@ -129,37 +130,59 @@ public class Main {
 
             // 遍历数组
             for (JsonNode data : dataArray) {
-                long time = data.get("time").asLong();
+                // 检查是否存在 "time" 字段
+                JsonNode timeNode = data.get("time");
+                if (timeNode != null) {
+                    long time = timeNode.asLong();
 
-                // 获取或创建该时间点对应的SensorData对象
-                SensorData sensorData = sensorDataMap.getOrDefault(time, new SensorData(time));
+                    // 获取或创建该时间点对应的SensorData对象
+                    SensorData sensorData = sensorDataMap.getOrDefault(time, new SensorData(time));
 
-                // 获取identifier字段
-                String identifier = data.get("identifier").asText();
+                    // 获取identifier字段
+                    String identifier = data.get("identifier").asText();
 
-                // 根据identifier字段判断是否为气体含量数据
-                switch (identifier) {
-                    case "CH4":
-                        sensorData.setCh4Value(data.get("value").asDouble());
-                        break;
-                    case "CO":
-                        sensorData.setCoValue(data.get("value").asDouble());
-                        break;
-                    case "CO2":
-                        sensorData.setCo2Value(data.get("value").asDouble());
-                        break;
-                    case "H2":
-                        sensorData.setH2Value(data.get("value").asDouble());
-                        break;
-                    default:
-                        // 其他类型的数据，忽略不处理
-                        break;
+                    // 获取value字段
+                    String value = data.has("value") ? data.get("value").asText() : null;
+
+                    // 根据identifier字段判断是否为气体含量数据
+                    switch (identifier) {
+                        case "CH4":
+                            sensorData.setCh4Value(data.get("value").asDouble());
+                            break;
+                        case "CO":
+                            sensorData.setCoValue(data.get("value").asDouble());
+                            break;
+                        case "CO2":
+                            sensorData.setCo2Value(data.get("value").asDouble());
+                            break;
+                        case "H2":
+                            sensorData.setH2Value(data.get("value").asDouble());
+                            break;
+                        case "alarm_info":
+                            // 如果identifier是alarm_info，设置flag和info
+                            if ("NONE".equals(value)) {
+                                sensorData.setFlag(false);
+                                sensorData.setInfo(null);
+                            } else {
+                                sensorData.setFlag(true);
+                                if(Objects.equals(value, "CH4")){
+                                    sensorData.setInfo("CH4浓度超标");
+                                }else if(Objects.equals(value, "H2")){
+                                    sensorData.setInfo("H2浓度超标");
+                                }else if(Objects.equals(value, "CO2")){
+                                    sensorData.setInfo("CO2浓度超标");
+                                }else if(Objects.equals(value, "CO")){
+                                    sensorData.setInfo("CO浓度超标");
+                                }
+
+                            }
+                            break;
+                    }
+
+                    // 将更新后的SensorData对象放入Map中
+                    sensorDataMap.put(time, sensorData);
                 }
-
-                // 将更新后的SensorData对象放入Map中
-                sensorDataMap.put(time, sensorData);
             }
-
             // 将Map中的所有SensorData对象添加到列表中
             sensorDataList.addAll(sensorDataMap.values());
         } catch (IOException e) {
@@ -169,21 +192,21 @@ public class Main {
         return sensorDataList;
     }
 
+
     // 将数据插入到PostgreSQL数据库中的方法
     private static void insertDataIntoDatabase(List<SensorData> sensorDataList, Connection connection) throws SQLException {
-        String query = "INSERT INTO sensor_data (co2_data, ch4_data, co_data, h2_data, time,flag) VALUES (?, ?, ?, ?, ?,?)";
+        String query = "INSERT INTO sensor_data (co2_data, ch4_data, co_data, h2_data, time, flag, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 
-        Instant instant = Instant.ofEpochMilli(SensorData.getTime());
-        LocalDateTime time = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
         for (SensorData sensorData : sensorDataList) {
             preparedStatement.setDouble(1, sensorData.getCo2Value());
             preparedStatement.setDouble(2, sensorData.getCh4Value());
             preparedStatement.setDouble(3, sensorData.getCoValue());
             preparedStatement.setDouble(4, sensorData.getH2Value());
-            preparedStatement.setObject(5, time);
-            preparedStatement.setBoolean(6, false);
+            preparedStatement.setObject(5, sensorData.getTime());
+            preparedStatement.setBoolean(6, sensorData.getFlag());
+            preparedStatement.setString(7, sensorData.getInfo());
             preparedStatement.addBatch();
         }
 
@@ -197,13 +220,17 @@ public class Main {
         private double coValue;
         private double co2Value;
         private double h2Value;
+        private boolean flag;
+        private String info;
 
         public SensorData(long time) {
             this.time = time;
         }
 
-        public static long getTime() {
-            return time;
+        public LocalDateTime getTime() {
+            Instant instant = Instant.ofEpochMilli(time);
+            LocalDateTime commonTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            return commonTime;
         }
 
         public double getCh4Value() {
@@ -236,6 +263,22 @@ public class Main {
 
         public void setH2Value(double h2Value) {
             this.h2Value = h2Value;
+        }
+
+        public boolean getFlag() {
+            return flag;
+        }
+
+        public void setFlag(boolean flag) {
+            this.flag = flag;
+        }
+
+        public String getInfo() {
+            return info;
+        }
+
+        public void setInfo(String info) {
+            this.info = info;
         }
     }
 }
