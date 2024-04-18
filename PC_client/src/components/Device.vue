@@ -35,15 +35,15 @@
         :data="filteredTableData"
         style="width: 100%">
       <el-table-column
-          prop="deviceId"
+          prop="device_id"
           label="设备ID">
       </el-table-column>
       <el-table-column
-          prop="location"
+          prop="site"
           label="设备地点">
       </el-table-column>
       <el-table-column
-          prop="onlineStatus"
+          prop="live"
           label="在线状态">
       </el-table-column>
       <el-table-column
@@ -61,45 +61,60 @@
 </template>
 
 <script>
+import {DeviceInfoAPI,DeviceDelete,DeviceLogin} from "@/plugins";
+
+
 export default {
   data() {
     return {
-      tableData: [
-        { deviceId: 'D1', location: '重庆市万州区五桥天星路666号', onlineStatus: '在线' },
-        { deviceId: 'D2', location: '重庆市沙坪坝区渝培路', onlineStatus: '离线' },
-        { deviceId: 'D8', location: '重庆市九龙坡区奥体三支路', onlineStatus: '在线' },
-        // 其他设备数据...
-      ],
+      tableData: [],
       searchInput: '',
       showAddDialog: false,
       addForm: {
-        deviceId: ''
+        device_id: ''
       }
     };
   },
   computed: {
     filteredTableData() {
       if (!this.searchInput) return this.tableData;
-      return this.tableData.filter(item => item.deviceId.includes(this.searchInput.trim()));
+      return this.tableData.filter(item => item.device_id.includes(this.searchInput.trim()));
     }
   },
   methods: {
     handleDelete(index) {
+      const deviceIdToDelete = this.tableData[index].device_id;
       this.tableData.splice(index, 1);
+      DeviceDelete(deviceIdToDelete);
     },
+
     handleAdd() {
-      this.tableData.push({
-        deviceId: this.addForm.deviceId,
-        location: '新地点',
-        onlineStatus: '新状态'
-      });
+      DeviceLogin(this.addForm.deviceId);
       this.showAddDialog = false;
       this.$refs.addForm.resetFields(); // 重置表单
+    },
+
+    getDeviceInfo() {
+      DeviceInfoAPI().then((res) => {
+        this.tableData = res.data
+      }).catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
     }
-  }
+  },
+  beforeDestroy() {
+    clearInterval(this.intervalId);
+  },
+  mounted() {
+    this.getDeviceInfo();
+    this.intervalId = setInterval(() => {
+      this.getDeviceInfo();
+    }, 1500);
+  },
 };
 </script>
 
+
 <style>
-/* 可以添加一些自定义样式 */
+
 </style>

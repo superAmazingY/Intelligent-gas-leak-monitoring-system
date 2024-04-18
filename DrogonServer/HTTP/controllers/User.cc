@@ -1,5 +1,6 @@
 #include "User.h"
 #include <string>
+#include <random>
 
 // Add definition of your processing function here
 void User::loginInfo(const HttpRequestPtr &req,
@@ -84,6 +85,65 @@ void User::oneNetInfo(const HttpRequestPtr &req, std::function<void(const HttpRe
     }
 }
 
+void User::deviceInfo(const HttpRequestPtr &req,
+                      std::function<void(const HttpResponsePtr &)> &&callback,
+                      std::string &&device_id) {
+    HttpResponsePtr resp;
+    auto clientPtr = drogon::app().getDbClient("default");
+    try{
+	// 定义城市列表
+        std::vector<std::string> cities = {"上海", "重庆", "成都", "深圳", "北京"};
+        // 生成随机城市
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, cities.size() - 1);
+        std::string site = cities[dis(gen)];
+
+        // 生成随机的 live 值
+        std::vector<std::string> liveOptions = {"在线", "离线"};
+        std::uniform_int_distribution<> disLive(0, liveOptions.size() - 1);
+        std::string live = liveOptions[disLive(gen)];
+
+
+        clientPtr->execSqlAsyncFuture("INSERT INTO public.device(device_id,site,live)VALUES ($1,$2,$3)",device_id,site,live);
+        LOG_DEBUG << "数据传输成功";
+        Json::Value ret;
+        ret["result"] = "ok";
+        ret["data"] = "数据传输成功";
+        resp = HttpResponse::newHttpJsonResponse(ret);
+        callback(resp);
+    }catch(const std::exception &e){
+        LOG_ERROR << e.what();
+    }
+}
+
+void User::device_deleteInfo(const HttpRequestPtr &req,
+                      std::function<void(const HttpResponsePtr &)> &&callback,
+                      std::string &&device_id)
+{
+    HttpResponsePtr resp;
+    auto clientPtr = drogon::app().getDbClient("default");
+    auto f = clientPtr->execSqlAsyncFuture("SELECT * FROM public.device WHERE device_id = $1", device_id);
+    try {
+        auto r = f.get();
+        if (r.size() > 0) {
+            clientPtr->execSqlAsyncFuture("DELETE FROM device WHERE device_id = $1",device_id );
+            Json::Value ret;
+            ret["result"] = "ok";
+            ret["data"] = "已删除设备";
+            resp = HttpResponse::newHttpJsonResponse(ret);
+        } else {
+            LOG_DEBUG << "device " << device_id  << "不存在";
+            Json::Value ret;
+            ret["result"] = "ok";
+            ret["data"] = "设备不存在";
+            resp = HttpResponse::newHttpJsonResponse(ret);
+        }
+        callback(resp);
+    } catch (const std::exception &e) {
+        LOG_ERROR << e.what();
+}
+}
 
 
 void User::getCH4Info(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
@@ -196,5 +256,28 @@ void User::getERRORInfo(const HttpRequestPtr &req, std::function<void(const Http
     }
 }
 
+void User::getDeviceInfo(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback)
+{
+    Json::Value result;
+    auto clientPtr = drogon::app().getDbClient("default");
+    auto f = clientPtr->execSqlAsyncFuture("SELECT device_id,site,live FROM public.device ORDER BY id desc ");
+    try{
+        auto r = f.get();
+        if(r.size() > 0){
+            for(const auto& row : r){
+                Json::Value obj;
+                obj["device_id"] = row["device_id"].as<std::string>();
+                obj["site"] = row["site"].as<std::string>();
+                obj["live"] = row["live"].as<std::string>();
+                result.append(obj);
+            }
+            std::reverse(result.begin(), result.end());
+            auto resp = HttpResponse::newHttpJsonResponse(result);
+            callback(resp);
+        }
+    }catch(const std::exception& e){
+        LOG_ERROR << e.what();
+    }
+}
 
 

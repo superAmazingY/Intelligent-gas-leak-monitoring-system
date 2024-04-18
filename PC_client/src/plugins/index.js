@@ -110,3 +110,26 @@ export const changeSwitchAPI = (CH4,H2,CO,CO2) => {
     });
 }
 
+export const DeviceInfoAPI = () => {
+    const url =`http://8.130.146.112:8099/user/DeviceInfo`;
+    return service({
+        url: url,
+        method: 'GET'
+    });
+}
+
+export const DeviceDelete = (ID) => {
+    const url =`http://8.130.146.112:8099/user/device_delete?device_id=${ID}`;
+    return service({
+        url: url,
+        method: 'POST'
+    });
+}
+
+export const DeviceLogin = (ID) => {
+    const url =`http://8.130.146.112:8099/user/device?device_id=${ID}`;
+    return service({
+        url: url,
+        method: 'POST'
+    });
+}
