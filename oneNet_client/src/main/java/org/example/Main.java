@@ -166,13 +166,13 @@ public class Main {
                             } else {
                                 sensorData.setFlag(true);
                                 if(Objects.equals(value, "CH4")){
-                                    sensorData.setInfo("CH4浓度超标");
+                                    sensorData.setInfo("甲烷浓度超标");
                                 }else if(Objects.equals(value, "H2")){
-                                    sensorData.setInfo("H2浓度超标");
+                                    sensorData.setInfo("氢气浓度超标");
                                 }else if(Objects.equals(value, "CO2")){
-                                    sensorData.setInfo("CO2浓度超标");
+                                    sensorData.setInfo("二氧化碳浓度超标");
                                 }else if(Objects.equals(value, "CO")){
-                                    sensorData.setInfo("CO浓度超标");
+                                    sensorData.setInfo("一氧化碳浓度超标");
                                 }
 
                             }
