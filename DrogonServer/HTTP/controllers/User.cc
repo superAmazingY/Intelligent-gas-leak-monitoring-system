@@ -177,7 +177,7 @@ void User::getH2Info(const HttpRequestPtr &req, std::function<void(const HttpRes
 void User::getERRORInfo(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
     Json::Value result;
     auto clientPtr = drogon::app().getDbClient("default");
-    auto f = clientPtr->execSqlAsyncFuture("SELECT info,time FROM public.sensor_data WHERE flag = 'true' ORDER BY id desc limit 5 ");
+    auto f = clientPtr->execSqlAsyncFuture("SELECT info,time FROM public.sensor_data WHERE flag = 'true' ORDER BY time asc");
     try{
         auto r = f.get();
         if(r.size() > 0){
