@@ -36,6 +36,21 @@
         <i class="el-icon-setting"></i>
         <span slot="title">设备控制</span>
       </el-menu-item>
+      <el-menu-item
+          index="/home/place"
+          :class="{ 'active-item': isActive('/home/place') }"
+      >
+        <i class="el-icon-s-flag"></i>
+        <span slot="title">设备分布</span>
+      </el-menu-item>
+
+      <el-menu-item
+          index="/home/device"
+          :class="{ 'active-item': isActive('/home/device') }"
+      >
+        <i class="el-icon-menu"></i>
+        <span slot="title">设备中心</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

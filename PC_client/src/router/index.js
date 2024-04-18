@@ -6,6 +6,8 @@ import index from "@/views/Index.vue";
 import monitoringCenter from "@/views/MonitoringCenter.vue";
 import setting from "@/views/Setting.vue";
 import dataCenter from "@/views/DataCenter.vue";
+import map from "@/components/Map.vue";
+import device from "@/components/Device.vue";
 
 Vue.use(Router);
 
@@ -30,6 +32,8 @@ const router = new Router({
                 {path: 'monitoringCenter',component: monitoringCenter}, //监控中心
                 {path: 'setting',component: setting}, //设备控制
                 {path: 'dataCenter',component: dataCenter}, //历史数据
+                {path: 'place',component: map}, //历史数据
+                {path: 'device',component: device}, //历史数据
             ],
         },
         {
