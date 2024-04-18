@@ -1,9 +1,3 @@
-/*
- * @Author: daidai
- * @Date: 2021-11-22 14:57:15
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-04-29 15:12:50
- */
 const path = require("path");
 function resolve(dir) {
   return path.join(__dirname, dir);
@@ -45,16 +39,6 @@ module.exports = {
       // 删除系统默认的splitChunk
       config.optimization.delete("splitChunks");
     }
-    // 删除预加载
-    //  // 移除 prefetch  插件
-    //  config.plugins.delete('prefetch-index')
-    //  // 移除 preload 插件
-    //  config.plugins.delete('preload-index');
-    //   config.optimization.minimizer('terser').tap((args) => {
-    //     // 去除生产环境console
-    //     args[0].terserOptions.compress.drop_console = true
-    //     return args
-    //   })
   },
   configureWebpack: config => {
     // 给输出的js名称添加hash
@@ -74,15 +58,6 @@ module.exports = {
             reuseExistingChunk: true,
             enforce: true
           },
-          // 抽离node_modules下的库为一个chunk
-          // vendors: {
-          //   name: "chunk-vendors",
-          //   test: /[\\/]node_modules[\\/]/,
-          //   chunks: "initial",
-          //   priority: 2,
-          //   reuseExistingChunk: true,
-          //   enforce: true
-          // },
           element: {
             name: "chunk-element-ui",
             test: /[\\/]node_modules[\\/]element-ui[\\/]/,
@@ -111,11 +86,10 @@ module.exports = {
       }
     };
   },
-  // 是否为 Babel 或 TypeScript 使用 thread-loader。该选项在系统的 CPU 有多于一个内核时自动启用，仅作用于生产构建。
   parallel: require('os').cpus().length > 1,
-
   devServer: {
-    // 配置多个代理
+    host: '0.0.0.0',
+    port: 8086
   },
   pluginOptions: {
   }

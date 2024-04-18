@@ -87,9 +87,6 @@ export default {
     handleDelete(index) {
       this.tableData.splice(index, 1);
     },
-    handleSearch() {
-      // 可以根据需要执行搜索操作
-    },
     handleAdd() {
       this.tableData.push({
         deviceId: this.addForm.deviceId,
